@@ -53,13 +53,14 @@ class UserGameController {
               id: true,
               type: true,
               duration: true,
+              imageUrl: true,
             },
           },
         },
         distinct: ["gameTypeId"],
       });
-
-      handleOK(res, 200, gamesPlayedByUser, "Games Fetched Played By User");
+      const data = gamesPlayedByUser.map((item) => item.Game);
+      handleOK(res, 200, data, "Games Fetched Played By User");
     } catch (error) {
       next(error);
     }
@@ -67,20 +68,35 @@ class UserGameController {
 
   static async fetchRecordForSingleGameType(req, res, next) {
     try {
-      const { gameTypeId } = req.query;
-      const userId = req.user.id;
+      const { gameTypeId } = req.params;
       const gameRecords = await prisma.userGameRecord.findMany({
         where: {
           id: Number(gameTypeId),
-          createdBy: userId,
+          createdBy: req.user.id,
         },
-        include: {
-          Game: true,
-          GameParticipant: true,
+        select: {
+          createdAt: true,
+          Game: {
+            select: {
+              duration: true,
+              type: true,
+            },
+          },
+          GameParticipant: {
+            select: {
+              name: true,
+              points: true,
+            },
+          },
         },
       });
 
-      handleOK(res, 200, gameRecords, "Successfully Fetched Single Game");
+      handleOK(
+        res,
+        200,
+        gameRecords,
+        "Successfully Fetched Records for Single Game Type"
+      );
     } catch (error) {
       next(error);
     }
