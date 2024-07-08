@@ -1,5 +1,5 @@
 const prisma = require("../../configs/prisma.config");
-const { ConflictError } = require("../../customError");
+const { ConflictError, NotFoundError } = require("../../customError");
 const { handleOK } = require("../../responseHandlers/responseHandler");
 const Utils = require("../../utils/globalUtils");
 
@@ -55,6 +55,27 @@ class UserProfileController {
       });
       token = Utils.generateToken({ userId: user.id });
       handleOK(res, 200, user, "Profile Created Successfully", token);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getMe(req, res, next) {
+    try {
+      const profile = await prisma.user.findFirst({
+        where: {
+          id: req.user.id,
+        },
+        select: {
+          firstName: true,
+          lastName: true,
+          dob: true,
+          city: true,
+          state: true,
+          address: true,
+        },
+      });
+      handleOK(res, 200, profile, "User Profile");
     } catch (error) {
       next(error);
     }

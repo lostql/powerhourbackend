@@ -9,6 +9,7 @@ const recordGameParticipantsAndPointSchema = require("../Schema/user/recordGameP
 const startGameSchema = require("../Schema/user/startGameSchema");
 const createUserProfileSchema = require("../Schema/user/userCreateProfileSchema");
 const fetchSingleGameTypeRecordSchema = require("../Schema/user/fetchRecordForSingleGameType");
+const getUserProfileSchema = require("../Schema/user/getUserProfileSchema");
 
 const userRouter = require("express").Router();
 
@@ -21,6 +22,7 @@ userRouter.post("/verify-otp", UserAuthController.verifyOTP);
 //resend OTP
 userRouter.post("/resend-otp", UserAuthController.resendOTP);
 
+/********************************************************PROFILE ROUTES***********************************************/
 userRouter.post(
   "/create-profile",
   upload.single("profile_picture"),
@@ -28,6 +30,9 @@ userRouter.post(
   UserProfileController.createProfile
 );
 
+userRouter.get("/get-profile", verifyToken, UserProfileController.getMe);
+
+/*******************************************************USER GAME ROUTES************************************************/
 //start game route
 userRouter.post(
   "/start-game",
