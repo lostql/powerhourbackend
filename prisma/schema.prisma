@@ -102,3 +102,19 @@ model GameWinner {
   updatedAt DateTime       @updatedAt
   Game      UserGameRecord @relation(fields: [gameId], references: [id])
 }
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AppSettings {
+  id                 Int    @id @default(autoincrement())
+  aboutApp           String @db.Text
+  termsAndConditions String @db.Text
+  privacyPolicy      String @db.Text
+}

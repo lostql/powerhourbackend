@@ -62,15 +62,6 @@ class UserAuthController {
       if (key == AuthProviders.EMAIL) {
         whereClause.email = providerValue;
       }
-      if (key == AuthProviders.FACEBOOK) {
-        whereClause.facebookId = providerValue;
-      }
-      if (key == AuthProviders.GOOGLE) {
-        whereClause.googleId = providerValue;
-      }
-      if (key == AuthProviders.APPLE) {
-        whereClause.appleId = providerValue;
-      }
 
       const existOTP = await prisma.userOtp.findFirst({
         where: whereClause,
@@ -88,7 +79,7 @@ class UserAuthController {
           },
         });
 
-        //if opt is verified then check if profile is created or not if created then just throw the user in profile object
+        //if otp is verified then check if profile is created or not if created then just throw the user in profile object
         if (key == AuthProviders.EMAIL) {
           existingProfileWithEmail = await prisma.user.findFirst({
             where: {

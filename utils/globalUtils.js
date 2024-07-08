@@ -1,4 +1,3 @@
-const { logger } = require("../configs/logger.config");
 const transporter = require("../configs/nodemailer.config");
 const jwt = require("jsonwebtoken");
 
@@ -36,6 +35,13 @@ class Utils {
     } catch (error) {
       throw new Error(error);
     }
+  }
+
+  static serializeAdmin(data) {
+    return {
+      imageUrl: data.imageUrl,
+      email: data.email,
+    };
   }
 }
 
