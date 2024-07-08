@@ -56,7 +56,7 @@ class UserGameController {
             },
           },
         },
-        distinct: ["gameId"],
+        distinct: ["gameTypeId"],
       });
 
       handleOK(res, 200, gamesPlayedByUser, "Games Fetched Played By User");
