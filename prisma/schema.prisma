@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum AuthProvider {
+  EMAIL
+  PHONE
+  FACEBOOK
+  GOOGLE
+  APPLE
+}
+
+model User {
+  id             Int              @id @default(autoincrement())
+  firstName      String
+  lastName       String
+  authProvider   AuthProvider
+  email          String?
+  gmail          String?
+  phoneNumber    String?
+  appleId        String?
+  facebookId     String?
+  dob            String
+  gender         String
+  address        String?
+  city           String
+  state          String
+  imageUrl       String?          @db.Text
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  notifications  Notification[]
+  UserGameRecord UserGameRecord[]
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserOtp {
+  id          Int      @id @default(autoincrement())
+  email       String?  @unique
+  phoneNumber String?  @unique
+  facebookId  String?  @unique
+  googleId    String?  @unique
+  appleId     String?  @unique
+  otp         String
+  isUsed      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Game {
+  id             Int              @id @default(autoincrement())
+  type           String           @unique
+  duration       String
+  imageUrl       String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  UserGameRecord UserGameRecord[]
+}
+
+model UserGameRecord {
+  id              Int               @id @default(autoincrement())
+  gameTypeId      Int
+  createdBy       Int
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  User            User              @relation(fields: [createdBy], references: [id])
+  Game            Game              @relation(fields: [gameTypeId], references: [id])
+  GameParticipant GameParticipant[]
+  GameWinner      GameWinner[]
+}
+
+model GameParticipant {
+  id        Int            @id @default(autoincrement())
+  gameId    Int
+  name      String
+  points    Int
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  Game      UserGameRecord @relation(fields: [gameId], references: [id])
+}
+
+model GameWinner {
+  id        Int            @id @default(autoincrement())
+  gameId    Int
+  name      String
+  points    Int
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  Game      UserGameRecord @relation(fields: [gameId], references: [id])
+}
