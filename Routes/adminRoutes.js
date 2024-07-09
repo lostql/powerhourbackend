@@ -1,9 +1,14 @@
 const adminAppController = require("../Controller/admin/admin.app.controller");
 const adminAuthController = require("../Controller/admin/admin.auth.controller");
 const { verifyAdminToken } = require("../Middlewares/adminAuthMiddleware");
+const { validateParams } = require("../Middlewares/validateParams");
 const { validateSchema } = require("../Middlewares/validateSchema");
 const changePasswordSchema = require("../Schema/admin/changePasswordSchema");
 const loginSchema = require("../Schema/admin/loginSchema");
+const {
+  updateAppSettingParamSchema,
+  updateAppSettingSchema,
+} = require("../Schema/admin/updateAppSettingsSchema");
 
 const adminRoutes = require("express").Router();
 
@@ -23,7 +28,9 @@ adminRoutes.post(
 
 /*********************************************************ADMIN APP SETTINGS ROUTES*****************************************/
 adminRoutes.patch(
-  "app-settings/:id",
+  "/app-settings/:id",
+  validateParams(updateAppSettingParamSchema),
+  validateSchema(updateAppSettingSchema),
   verifyAdminToken,
   adminAppController.updateAppSettings
 );

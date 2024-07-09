@@ -1,21 +1,18 @@
 const prisma = require("../../configs/prisma.config");
 const { handleOK } = require("../../responseHandlers/responseHandler");
+const Utils = require("../../utils/globalUtils");
 
 class adminAppController {
   static async updateAppSettings(req, res, next) {
     try {
-      const { id } = req.params;
-      const { privacyPolicy, aboutApp, termsAndConditions } = req.body;
-      await prisma.appSettings.update({
+      const updateAppPayload = Utils.removeNullValuesFromObject(req.body);
+      const updatedSettings = await prisma.appSettings.update({
         where: {
-          id: Number(id),
+          id: Number(req.params.id),
         },
-        data: {
-          privacyPolicy,
-          aboutApp,
-          termsAndConditions,
-        },
+        data: updateAppPayload,
       });
+      handleOK(res, 200, updatedSettings, "App Settings Updated Successfully");
     } catch (error) {
       next(error);
     }

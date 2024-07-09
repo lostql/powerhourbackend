@@ -43,6 +43,19 @@ class Utils {
       email: data.email,
     };
   }
+
+  static removeNullValuesFromObject(object) {
+    try {
+      if (!Object.keys(object).length) {
+        return;
+      }
+      return Object.fromEntries(
+        Object.entries(object).filter(([_, value]) => value != null)
+      );
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 }
 
 module.exports = Utils;
