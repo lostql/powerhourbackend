@@ -1,5 +1,8 @@
+const { PutObjectCommand } = require("@aws-sdk/client-s3");
 const transporter = require("../configs/nodemailer.config");
 const jwt = require("jsonwebtoken");
+const s3 = require("../configs/s3.config");
+const fs = require("fs");
 
 class Utils {
   static generateOTP() {
@@ -52,6 +55,23 @@ class Utils {
       return Object.fromEntries(
         Object.entries(object).filter(([_, value]) => value != null)
       );
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  static async handleS3Upload(path, filename, contentType, folder) {
+    try {
+      const fileBuffer = fs.readFileSync(path);
+      const command = new PutObjectCommand({
+        Bucket: process.env.BUCKET_NAME,
+        Key: `${folder}/${filename}`,
+        ContentType: contentType,
+        Body: fileBuffer,
+      });
+      await s3.send(command);
+      fs.unlinkSync(path);
+      return `${process.env.AWS_S3_URL}/${folder}/${filename}`;
     } catch (error) {
       throw new Error(error);
     }

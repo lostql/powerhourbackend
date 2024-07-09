@@ -6,7 +6,17 @@ const Utils = require("../../utils/globalUtils");
 class UserProfileController {
   static async createProfile(req, res, next) {
     try {
+      let imageUrl = null;
       let token = null;
+
+      if (req.file) {
+        imageUrl = await Utils.handleS3Upload(
+          req.file.path,
+          req.file.filename,
+          req.file.mimetype,
+          "user"
+        );
+      }
 
       const {
         firstName,
@@ -20,6 +30,7 @@ class UserProfileController {
         city,
         state,
       } = req.body;
+
       const existUser = await prisma.user.findFirst({
         where: {
           OR: [
@@ -41,6 +52,7 @@ class UserProfileController {
 
       const user = await prisma.user.create({
         data: {
+          imageUrl,
           authProvider,
           firstName,
           lastName,
