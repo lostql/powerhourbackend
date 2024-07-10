@@ -63,19 +63,22 @@ class UserAuthController {
       });
 
       if (existProfileWithEmail) {
+        const token = Utils.generateToken({ userId: existProfileWithEmail.id });
         handleOK(
           res,
           200,
           { profile: existProfileWithEmail },
-          "Successfully sign up"
+          "Successfully sign up",
+          token
+        );
+      } else {
+        handleOK(
+          res,
+          200,
+          { authProvider: AuthProviders.GOOGLE, email: payload.email },
+          "Successfully authenticated with google, Now please create profile"
         );
       }
-      handleOK(
-        res,
-        200,
-        { authProvider: AuthProviders.GOOGLE },
-        "Successfully authenticated with google, now please create profile"
-      );
     } catch (error) {
       next(error);
     }
