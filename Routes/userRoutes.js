@@ -9,7 +9,7 @@ const recordGameParticipantsAndPointSchema = require("../Schema/user/recordGameP
 const startGameSchema = require("../Schema/user/startGameSchema");
 const createUserProfileSchema = require("../Schema/user/userCreateProfileSchema");
 const fetchSingleGameTypeRecordSchema = require("../Schema/user/fetchRecordForSingleGameType");
-const signInWithGoogleSchema = require("../Schema/user/signInWithGoogleSchema");
+const socialLoginSchema = require("../Schema/user/socialLoginSchema");
 
 const userRouter = require("express").Router();
 
@@ -19,8 +19,14 @@ userRouter.post("/sign-in/phone", UserAuthController.signInWithPhone); //todo wi
 
 userRouter.post(
   "/sign-in/google",
-  validateSchema(signInWithGoogleSchema),
+  validateSchema(socialLoginSchema),
   UserAuthController.signInWithGoogle
+);
+
+userRouter.post(
+  "/sign-in/facebook",
+  validateSchema(socialLoginSchema),
+  UserAuthController.signInWithFacebook
 );
 
 userRouter.post("/verify-otp", UserAuthController.verifyOTP);

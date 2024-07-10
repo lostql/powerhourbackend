@@ -1,9 +1,10 @@
 const googleClient = require("../../configs/googleAuth.config");
 const prisma = require("../../configs/prisma.config");
-const { BadRequestError } = require("../../customError");
+const { BadRequestError, UnauthorizedError } = require("../../customError");
 const { handleOK } = require("../../responseHandlers/responseHandler");
 const { AuthProviders } = require("../../utils/constants");
 const Utils = require("../../utils/globalUtils");
+const axios = require("axios");
 
 class UserAuthController {
   static async signInWithPhone() {
@@ -80,6 +81,47 @@ class UserAuthController {
         );
       }
     } catch (error) {
+      next(error);
+    }
+  }
+
+  static async signInWithFacebook(req, res, next) {
+    try {
+      const { token } = req.body;
+      const response = await axios.get(
+        `https://graph.facebook.com/me?access_token=${token}&fields=email`
+      );
+      const { email } = response.data;
+      if (!email) {
+        throw new Error("Something went wrong");
+      }
+
+      const existProfileWithEmail = await prisma.user.findFirst({
+        where: {
+          email,
+        },
+      });
+      if (existProfileWithEmail) {
+        const token = Utils.generateToken({ userId: existProfileWithEmail.id });
+        handleOK(
+          res,
+          200,
+          { profile: existProfileWithEmail },
+          "Successfully sign up",
+          token
+        );
+      } else {
+        handleOK(
+          res,
+          200,
+          { authProvider: AuthProviders.FACEBOOK, email },
+          "Successfully authenticated with Facebook,Now please create Profile"
+        );
+      }
+    } catch (error) {
+      if (error?.response?.data?.error?.code == 190) {
+        next(new UnauthorizedError("Error verifying token"));
+      }
       next(error);
     }
   }
