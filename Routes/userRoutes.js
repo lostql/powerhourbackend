@@ -9,13 +9,19 @@ const recordGameParticipantsAndPointSchema = require("../Schema/user/recordGameP
 const startGameSchema = require("../Schema/user/startGameSchema");
 const createUserProfileSchema = require("../Schema/user/userCreateProfileSchema");
 const fetchSingleGameTypeRecordSchema = require("../Schema/user/fetchRecordForSingleGameType");
-const getUserProfileSchema = require("../Schema/user/getUserProfileSchema");
+const signInWithGoogleSchema = require("../Schema/user/signInWithGoogleSchema");
 
 const userRouter = require("express").Router();
 
 userRouter.post("/sign-in/email", UserAuthController.signInWithEmail);
 
 userRouter.post("/sign-in/phone", UserAuthController.signInWithPhone); //todo will use twilio
+
+userRouter.post(
+  "/sign-in/google",
+  validateSchema(signInWithGoogleSchema),
+  UserAuthController.signInWithGoogle
+);
 
 userRouter.post("/verify-otp", UserAuthController.verifyOTP);
 

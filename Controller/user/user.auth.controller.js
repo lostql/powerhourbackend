@@ -1,3 +1,4 @@
+const googleClient = require("../../configs/googleAuth.config");
 const prisma = require("../../configs/prisma.config");
 const { BadRequestError } = require("../../customError");
 const { handleOK } = require("../../responseHandlers/responseHandler");
@@ -36,6 +37,44 @@ class UserAuthController {
         userOtp.email,
         "OTP VERIFICATION CODE",
         `Enter this OTP to verify your account ${userOtp.otp}`
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async signInWithGoogle(req, res, next) {
+    try {
+      const { token } = req.body;
+      const ticket = await googleClient.verifyIdToken({
+        idToken: token,
+        audience: process.env.OAUTH_GOOGLE_CLIENT_ID,
+      });
+
+      const payload = ticket.getPayload();
+      if (!payload.email) {
+        throw new Error("Something went wrong try again please");
+      }
+
+      const existProfileWithEmail = await prisma.user.findFirst({
+        where: {
+          email: payload.email,
+        },
+      });
+
+      if (existProfileWithEmail) {
+        handleOK(
+          res,
+          200,
+          { profile: existProfileWithEmail },
+          "Successfully sign up"
+        );
+      }
+      handleOK(
+        res,
+        200,
+        { authProvider: AuthProviders.GOOGLE },
+        "Successfully authenticated with google, now please create profile"
       );
     } catch (error) {
       next(error);
