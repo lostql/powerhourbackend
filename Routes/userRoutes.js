@@ -63,10 +63,10 @@ userRouter.get(
 
 //route for storing participants and winners for pre and power hour game
 userRouter.post(
-  "/store-game-record/power-prehour",
+  "/store-game-record/power-prehour-silenthour",
   verifyToken,
   validateSchema(recordPreGameAndPowerHourSchema),
-  UserGameController.recordPreGameAndPowerHour
+  UserGameController.recordPreGamePowerHourAndSilentHour
 );
 
 //game completed-record points and participants route

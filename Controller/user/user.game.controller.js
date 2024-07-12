@@ -26,7 +26,7 @@ class UserGameController {
   }
 
   //api end point for pre game and power hour
-  static async recordPreGameAndPowerHour(req, res, next) {
+  static async recordPreGamePowerHourAndSilentHour(req, res, next) {
     try {
       const { participants, gameId, isCompleted } = req.body;
       if (isCompleted) {
