@@ -76,6 +76,54 @@ class Utils {
       throw new Error(error);
     }
   }
+
+  static sortWinnersForPreAndPowerHourGame(participants, gameId) {
+    try {
+      //if everyone is out then make points to 0 means no winner
+      const isEveryOneOut = participants.every(
+        (participant) => participant.isOut === true
+      );
+
+      if (isEveryOneOut) {
+        const winners = participants.map((item) => ({
+          name: item.name,
+          gameId,
+          points: 0,
+        }));
+        return winners;
+      }
+
+      //if everyone has same points and nobody is out
+      const isEveryOneWinner = participants.every(
+        (participant, _, arr) =>
+          participant.points === arr[0].points && participant.isOut == false
+      );
+
+      if (isEveryOneWinner) {
+        const winners = participants.map((item) => ({
+          name: item.name,
+          points: item.points,
+          gameId,
+        }));
+        return winners;
+      }
+
+      //everyone is not out so first filter who is out and then sort them and construct an array of winners
+      const winners = participants
+        .filter((item) => item.isOut === false)
+        .sort((a, b) => b.points - a.points)
+        .map((item) => ({ name: item.name, points: item.points, gameId }));
+
+      //return only 3 winners from
+      if (winners.length > 3) {
+        return winners.slice(0, 3);
+      }
+
+      return winners;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 }
 
 module.exports = Utils;

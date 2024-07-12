@@ -10,6 +10,7 @@ const startGameSchema = require("../Schema/user/startGameSchema");
 const createUserProfileSchema = require("../Schema/user/userCreateProfileSchema");
 const fetchSingleGameTypeRecordSchema = require("../Schema/user/fetchRecordForSingleGameType");
 const socialLoginSchema = require("../Schema/user/socialLoginSchema");
+const recordPreGameAndPowerHourSchema = require("../Schema/user/recordPreGameAndPowerHourSchema");
 
 const userRouter = require("express").Router();
 
@@ -58,6 +59,14 @@ userRouter.get(
   "/fetch-games",
   verifyToken,
   UserGameController.fetchGamesPlayedByUsers
+);
+
+//route for storing participants and winners for pre and power hour game
+userRouter.post(
+  "/store-game-record/power-prehour",
+  verifyToken,
+  validateSchema(recordPreGameAndPowerHourSchema),
+  UserGameController.recordPreGameAndPowerHour
 );
 
 //game completed-record points and participants route

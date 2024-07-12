@@ -10,6 +10,10 @@ const participantSchema = z.object({
   points: z
     .number({ message: "Participant score must be of type number" })
     .min(1, { message: "Invalid score, score cannot be less than 1" }),
+  isLeft: z.boolean({
+    required_error: "isLeft is required",
+    invalid_type_error: "isLeft must be a boolean",
+  }),
 });
 
 const recordGameParticipantsAndPointSchema = z.object({
@@ -17,8 +21,7 @@ const recordGameParticipantsAndPointSchema = z.object({
     .number({ message: "game id must be of type number" })
     .min(1, "Invalid game id, it cannot be less than 1"),
   participants: z.array(participantSchema).min(2, {
-    message:
-      "At least two participants should participate to record the game score",
+    message: "minimum 2 players are required to record the game",
   }),
 });
 

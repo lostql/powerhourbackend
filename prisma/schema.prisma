@@ -75,6 +75,7 @@ model UserGameRecord {
   id              Int               @id @default(autoincrement())
   gameTypeId      Int
   createdBy       Int
+  isCompleted     Boolean           @default(false)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   User            User              @relation(fields: [createdBy], references: [id])
@@ -87,7 +88,7 @@ model GameParticipant {
   id        Int            @id @default(autoincrement())
   gameId    Int
   name      String
-  points    Int
+  points    Int            @default(10)
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
   Game      UserGameRecord @relation(fields: [gameId], references: [id])
@@ -97,10 +98,19 @@ model GameWinner {
   id        Int            @id @default(autoincrement())
   gameId    Int
   name      String
-  points    Int
+  points    Int            @default(10)
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
   Game      UserGameRecord @relation(fields: [gameId], references: [id])
+}
+
+model Achievements {
+  id        Int      @id @default(autoincrement())
+  name      String
+  points    Int
+  imageUrl  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Admin {
