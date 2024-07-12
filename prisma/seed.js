@@ -3,6 +3,7 @@ const prisma = require("../configs/prisma.config");
 async function main() {
   let admin = false;
   let settings = false;
+  let achievements = false;
   if (admin) {
     await prisma.admin.upsert({
       where: { email: "powerhour@gmail.com" },
@@ -61,6 +62,76 @@ Your use of any information or materials on this website is entirely at your own
         aboutApp: sampleAboutApp,
       },
     });
+  }
+
+  if (achievements) {
+    const record = [
+      {
+        name: "First Achievement",
+        points: 10,
+        threshold: 5,
+        imageUrl: "https://example.com/image1.png",
+      },
+      {
+        name: "Second Achievement",
+        points: 20,
+        threshold: 10,
+        imageUrl: "https://example.com/image2.png",
+      },
+      {
+        name: "Third Achievement",
+        points: 30,
+        threshold: 10,
+        imageUrl: "https://example.com/image3.png",
+      },
+      {
+        name: "Fourth Achievement",
+        points: 40,
+        threshold: 10,
+        imageUrl: "https://example.com/image4.png",
+      },
+      {
+        name: "Fifth Achievement",
+        points: 50,
+        threshold: 10,
+        imageUrl: "https://example.com/image5.png",
+      },
+      {
+        name: "Sixth Achievement",
+        points: 60,
+        threshold: 10,
+        imageUrl: "https://example.com/image6.png",
+      },
+      {
+        name: "Seventh Achievement",
+        points: 70,
+        threshold: 10,
+        imageUrl: "https://example.com/image7.png",
+      },
+      {
+        name: "Eighth Achievement",
+        points: 80,
+        threshold: 10,
+        imageUrl: "https://example.com/image8.png",
+      },
+      {
+        name: "Ninth Achievement",
+        points: 90,
+        threshold: 10,
+        imageUrl: "https://example.com/image9.png",
+      },
+      {
+        name: "Tenth Achievement",
+        points: 100,
+        threshold: 10,
+        imageUrl: "https://example.com/image10.png",
+      },
+    ];
+    await prisma.achievement.createMany({
+      data: record,
+    });
+
+    console.log("Achievements seeded successfully.");
   }
 }
 main()

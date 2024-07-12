@@ -25,7 +25,7 @@ class UserGameController {
     }
   }
 
-  //api end point for pre game and power hour
+  //end point for pre game and power hour
   static async recordPreGamePowerHourAndSilentHour(req, res, next) {
     try {
       const { participants, gameId, isCompleted } = req.body;
@@ -48,6 +48,15 @@ class UserGameController {
           }),
           prisma.gameWinner.createMany({
             data: winners,
+          }),
+          prisma.userGameRecord.update({
+            where: {
+              createdBy: req.user.userId,
+              id: gameId,
+            },
+            data: {
+              isCompleted: true,
+            },
           }),
         ]);
 
@@ -72,6 +81,81 @@ class UserGameController {
           "game not completed, No Participants and Winners recorded"
         );
       }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  //end point for increementing user completed games count
+  //first achievement will be unlocked on 5 games and other than on 10 games
+  static async updateOrCreateAchievements(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const completedGamesCount = await prisma.userGameRecord.count({
+        where: {
+          createdBy: userId,
+          isCompleted: true,
+        },
+      });
+      const achievements = await prisma.achievement.findMany({
+        orderBy: { threshold: "asc" },
+      });
+
+      let previousThreshold = 0;
+
+      for (let achievement of achievements) {
+        const { threshold, id } = achievement;
+
+        if (
+          completedGamesCount >= previousThreshold &&
+          completedGamesCount < threshold
+        ) {
+          const progress = (completedGamesCount / threshold) * 100;
+          await prisma.userAchievement.upsert({
+            where: {
+              userId_achievementId: {
+                userId,
+                achievementId: id,
+              },
+            },
+            update: {
+              progress,
+              achievedAt: progress === 100 ? new Date() : null,
+            },
+            create: {
+              userId,
+              achievementId: id,
+              progress,
+              achievedAt: progress === 100 ? new Date() : null,
+            },
+          });
+          break;
+        }
+
+        if (completedGamesCount >= threshold) {
+          await prisma.userAchievement.upsert({
+            where: {
+              userId_achievementId: {
+                userId,
+                achievementId: id,
+              },
+            },
+            update: {
+              progress: 100,
+              achievedAt: new Date(),
+            },
+            create: {
+              userId,
+              achievementId: id,
+              progress: 100,
+              achievedAt: new Date(),
+            },
+          });
+          previousThreshold = threshold;
+        }
+      }
+
+      res.status(200).json({ message: "Achievements updated successfully" });
     } catch (error) {
       next(error);
     }
@@ -135,6 +219,25 @@ class UserGameController {
         gameRecords,
         "Successfully Fetched Records for Single Game Type"
       );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  //get all user achievements with progress
+  static async getAllAchievements(req, res, next) {
+    try {
+      const userId = req.user.userId;
+      const userAchievements = await prisma.achievement.findMany({
+        where: {
+          UserAchievement: {
+            every: {
+              id: userId,
+            },
+          },
+        },
+      });
+      handleOK(res, 200, userAchievements, "success");
     } catch (error) {
       next(error);
     }

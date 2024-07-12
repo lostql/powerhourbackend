@@ -5,7 +5,6 @@ const { verifyToken } = require("../Middlewares/authMiddleware");
 const upload = require("../Middlewares/multerMiddleware");
 const { validateSchema } = require("../Middlewares/validateSchema");
 const { validateParams } = require("../Middlewares/validateParams");
-const recordGameParticipantsAndPointSchema = require("../Schema/user/recordGameParticipantsAndPoints");
 const startGameSchema = require("../Schema/user/startGameSchema");
 const createUserProfileSchema = require("../Schema/user/userCreateProfileSchema");
 const fetchSingleGameTypeRecordSchema = require("../Schema/user/fetchRecordForSingleGameType");
@@ -67,6 +66,12 @@ userRouter.post(
   verifyToken,
   validateSchema(recordPreGameAndPowerHourSchema),
   UserGameController.recordPreGamePowerHourAndSilentHour
+);
+
+userRouter.post(
+  "/update-achievements",
+  verifyToken,
+  UserGameController.updateOrCreateAchievements
 );
 
 //fetch
