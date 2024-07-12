@@ -69,14 +69,6 @@ userRouter.post(
   UserGameController.recordPreGamePowerHourAndSilentHour
 );
 
-//game completed-record points and participants route
-userRouter.post(
-  "/store-game-record",
-  verifyToken,
-  validateSchema(recordGameParticipantsAndPointSchema),
-  UserGameController.recordPartcipantsAndWinners
-);
-
 //fetch
 userRouter.get(
   "/fetch-single-game/participants/:gameTypeId",

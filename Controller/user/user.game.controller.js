@@ -77,33 +77,6 @@ class UserGameController {
     }
   }
 
-  static async recordPartcipantsAndWinners(req, res, next) {
-    try {
-      const { participants, gameId, isCompleted } = req.body;
-      //if game is completed then record the participants and winners.
-      if (isCompleted) {
-        //now game is completed means time is up and there were participants till the end
-        //and we have to record participants and winners
-        const participantData = participants.map((participant) => ({
-          ...participant,
-          gameId,
-        }));
-        const gameParticipants = await prisma.gameParticipant.createMany({
-          data: participantData,
-        });
-
-        handleOK(
-          res,
-          200,
-          gameParticipants,
-          "Game Participants Recorded Successfully"
-        );
-      }
-    } catch (error) {
-      next(error);
-    }
-  }
-
   static async fetchGamesPlayedByUsers(req, res, next) {
     try {
       const userId = req.user.id;
