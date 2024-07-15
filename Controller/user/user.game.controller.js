@@ -91,71 +91,38 @@ class UserGameController {
   static async updateOrCreateAchievements(req, res, next) {
     try {
       const userId = req.user.id;
+
       const completedGamesCount = await prisma.userGameRecord.count({
         where: {
           createdBy: userId,
           isCompleted: true,
         },
       });
-      const achievements = await prisma.achievement.findMany({
-        orderBy: { threshold: "asc" },
+
+      const achievements = await prisma.achievement.findMany({});
+      let remainingGames = completedGamesCount;
+
+      const calculateAchievementProgress = (threshold, remainingGames) => {
+        if (remainingGames >= threshold) {
+          remainingGames -= threshold;
+          return { progress: 100, remainingGames };
+        } else {
+          const progress = (remainingGames / threshold) * 100;
+          remainingGames = 0;
+          return { progress, remainingGames };
+        }
+      };
+
+      const progressResults = achievements.map((achievement) => {
+        const { id, threshold, imageUrl, name } = achievement;
+        const { progress, remainingGames: updatedRemainingGames } =
+          calculateAchievementProgress(threshold, remainingGames);
+        remainingGames = updatedRemainingGames;
+
+        return { id, progress, imageUrl, name };
       });
 
-      let previousThreshold = 0;
-
-      for (let achievement of achievements) {
-        const { threshold, id } = achievement;
-
-        if (
-          completedGamesCount >= previousThreshold &&
-          completedGamesCount < threshold
-        ) {
-          const progress = (completedGamesCount / threshold) * 100;
-          await prisma.userAchievement.upsert({
-            where: {
-              userId_achievementId: {
-                userId,
-                achievementId: id,
-              },
-            },
-            update: {
-              progress,
-              achievedAt: progress === 100 ? new Date() : null,
-            },
-            create: {
-              userId,
-              achievementId: id,
-              progress,
-              achievedAt: progress === 100 ? new Date() : null,
-            },
-          });
-          break;
-        }
-
-        if (completedGamesCount >= threshold) {
-          await prisma.userAchievement.upsert({
-            where: {
-              userId_achievementId: {
-                userId,
-                achievementId: id,
-              },
-            },
-            update: {
-              progress: 100,
-              achievedAt: new Date(),
-            },
-            create: {
-              userId,
-              achievementId: id,
-              progress: 100,
-              achievedAt: new Date(),
-            },
-          });
-          previousThreshold = threshold;
-        }
-      }
-
-      res.status(200).json({ message: "Achievements updated successfully" });
+      handleOK(res, 200, progressResults, "Achievements with progress fetched");
     } catch (error) {
       next(error);
     }
