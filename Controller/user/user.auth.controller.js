@@ -7,10 +7,52 @@ const Utils = require("../../utils/globalUtils");
 const axios = require("axios");
 
 class UserAuthController {
-  static async signInWithPhone() {
+  static async signInWithPhone(req, res, next) {
     try {
-      //TODO
-      //will use twilio
+      const { phoneNumber } = req.body;
+      const existProfile = await prisma.user.findFirst({
+        where: {
+          AND: [
+            {
+              phoneNumber,
+            },
+            {
+              authProvider: {
+                in: [
+                  AuthProviders.APPLE,
+                  AuthProviders.EMAIL,
+                  AuthProviders.GOOGLE,
+                  AuthProviders.FACEBOOK,
+                ],
+              },
+            },
+          ],
+        },
+      });
+      if (existProfile) {
+        throw new BadRequestError(
+          "This phone number is already associated with different signin method"
+        );
+      }
+      const otp = Utils.generateOTP();
+      const newPhoneOTP = await prisma.userOtp.upsert({
+        where: {
+          phoneNumber,
+        },
+        create: {
+          otp,
+          phoneNumber,
+        },
+        update: {
+          otp,
+          isUsed: false,
+        },
+      });
+      await Utils.sendMessage(
+        phoneNumber,
+        `Welcome to PowerHour, Your verification OTP is ${newPhoneOTP.otp}`
+      );
+      handleOK(res, 200, null, "An OTP has been sent your phone number");
     } catch (error) {
       next(error);
     }
@@ -167,6 +209,7 @@ class UserAuthController {
         if (key == AuthProviders.EMAIL) {
           existingProfileWithEmail = await prisma.user.findFirst({
             where: {
+              authProvider: AuthProviders.EMAIL,
               email: providerValue,
             },
           });
@@ -175,6 +218,7 @@ class UserAuthController {
         if (key == AuthProviders.PHONE_NUMBER) {
           existingProfileWithPhone = await prisma.user.findFirst({
             where: {
+              authProvider: AuthProviders.PHONE,
               phoneNumber: providerValue,
             },
           });

@@ -1,6 +1,6 @@
 const AuthProviders = {
   EMAIL: "EMAIL",
-  PHONE_NUMBER: "PHONENUMBER",
+  PHONE: "PHONE",
   FACEBOOK: "FACEBOOK",
   GOOGLE: "GOOGLE",
   APPLE: "APPLE",

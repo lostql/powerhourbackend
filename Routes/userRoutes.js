@@ -10,6 +10,7 @@ const createUserProfileSchema = require("../Schema/user/userCreateProfileSchema"
 const fetchSingleGameTypeRecordSchema = require("../Schema/user/fetchRecordForSingleGameType");
 const socialLoginSchema = require("../Schema/user/socialLoginSchema");
 const recordPreGameAndPowerHourSchema = require("../Schema/user/recordPreGameAndPowerHourSchema");
+const signInWithPhoneNumberSchema = require("../Schema/user/signInwIthPhoneNumberSchema");
 
 const userRouter = require("express").Router();
 
@@ -27,6 +28,12 @@ userRouter.post(
   "/sign-in/facebook",
   validateSchema(socialLoginSchema),
   UserAuthController.signInWithFacebook
+);
+
+userRouter.post(
+  "/sign-in/phone-number",
+  validateSchema(signInWithPhoneNumberSchema),
+  UserAuthController.signInWithPhone
 );
 
 userRouter.post("/verify-otp", UserAuthController.verifyOTP);

@@ -32,6 +32,7 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "prisma": "^5.16.1",
+    "twilio": "^5.2.2",
     "winston": "^3.13.0",
     "zod": "^3.23.8"
   }

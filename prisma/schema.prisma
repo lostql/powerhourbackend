@@ -21,10 +21,7 @@ model User {
   lastName       String
   authProvider   AuthProvider
   email          String?
-  gmail          String?
   phoneNumber    String?
-  appleId        String?
-  facebookId     String?
   dob            String
   gender         String
   address        String?
@@ -52,9 +49,6 @@ model UserOtp {
   id          Int      @id @default(autoincrement())
   email       String?  @unique
   phoneNumber String?  @unique
-  facebookId  String?  @unique
-  googleId    String?  @unique
-  appleId     String?  @unique
   otp         String
   isUsed      Boolean  @default(false)
   createdAt   DateTime @default(now())

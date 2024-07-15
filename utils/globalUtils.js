@@ -3,6 +3,7 @@ const transporter = require("../configs/nodemailer.config");
 const jwt = require("jsonwebtoken");
 const s3 = require("../configs/s3.config");
 const fs = require("fs");
+const twilioClient = require("../configs/twilio.config");
 
 class Utils {
   static generateOTP() {
@@ -120,6 +121,29 @@ class Utils {
       }
 
       return winners;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  static async sendMessage(to, message) {
+    try {
+      return new Promise((resolve, reject) => {
+        twilioClient.messages
+          .create({
+            body: message,
+            from: process.env.TWILIO_NUMBER,
+            to: to,
+          })
+          .then((message) => {
+            console.log(message);
+            resolve(message);
+          })
+          .catch((error) => {
+            console.log(error);
+            reject(error);
+          });
+      });
     } catch (error) {
       throw new Error(error);
     }
